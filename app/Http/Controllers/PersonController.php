@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Models\Person;
 
 class PersonController extends Controller
 {
@@ -25,8 +26,8 @@ class PersonController extends Controller
     public function store(Request $request)
     {
         // 可改寫
-        // $request->validate()
-        $validator = Validator::make($request->all(),
+        $request->validate(
+        // $validator = Validator::make($request->all(),
             [
                 'name' => 'required',
                 'address' => 'required',
@@ -59,6 +60,8 @@ class PersonController extends Controller
             $person->save();
 
             // return redirect()->route('persons.index')->with('success', '已成功新增資料。');
+
+            $person = Person::create($request->all());
 
             return [
                 'person' => $person,
@@ -143,6 +146,16 @@ class PersonController extends Controller
     public function destroy($person_id)
     {
         $person = Person::find($person_id);
+
+        if(!$person) {
+            return [
+                'message' => [
+                    'type' => 'danger',
+                    'body' => '此聯絡人不存在。'
+                ]
+            ];
+        }
+
         $person->delete();
         // return redirect()->route('persons.index')->with('success', '已成功刪除資料。');
 
